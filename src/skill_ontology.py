@@ -29,7 +29,8 @@ skill_ontology: Dict[str, Dict[str, List[str]]] = {
     },
     "Machine Learning": {
         "machine learning": ["machine learning", "ml", "supervised learning", "unsupervised learning", "reinforcement learning"],
-        "scikit-learn": ["scikit-learn", "sklearn"],
+        "scikit-learn": ["scikit-learn", "scikit learn", "sklearn"],
+        "data preprocessing": ["data preprocessing", "data pre-processing", "data preparation", "data cleaning"],
         "xgboost": ["xgboost", "xgb"],
         "lightgbm": ["lightgbm", "lgbm"],
         "model deployment": ["model deployment", "mlops"],
@@ -41,7 +42,8 @@ skill_ontology: Dict[str, Dict[str, List[str]]] = {
         "tensorflow": ["tensorflow", "tf"],
         "pytorch": ["pytorch", "torch"],
         "keras": ["keras"],
-        "cnns": ["cnns", "convolutional neural networks", "computer vision"],
+        "computer vision": ["computer vision", "cnn", "cnns", "convolutional neural networks"],
+        "generative ai": ["generative ai", "gen ai", "generative artificial intelligence"],
         "rnns": ["rnns", "recurrent neural networks"],
         "transformers": ["transformers", "bert", "gpt", "encoder decoder models"],
     },
@@ -74,6 +76,7 @@ skill_ontology: Dict[str, Dict[str, List[str]]] = {
     },
     "Tools": {
         "git": ["git", "github", "gitlab", "bitbucket", "version control"],
+        "vs code": ["vs code", "vscode", "visual studio code"],
         "jira": ["jira"],
         "confluence": ["confluence"],
         "airflow": ["airflow"],

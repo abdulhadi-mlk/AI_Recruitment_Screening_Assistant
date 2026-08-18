@@ -214,41 +214,41 @@ def show_results(a):
     job_skill_match_pct = a.get('job_skill_match_score', 0.0)
 
     # Render tool analysis card
-    tools_html = (
-        "<div class='card'><div class='kicker'>🛠️ Tool Match Analysis</div><h3 class='heading'>Tools required by the job</h3>"
-        f"<div class='copy' style='margin-top:.5rem'>Tools Required: <strong>{total_tools}</strong> &nbsp;&nbsp; Matched: <strong>{matched_count}</strong> &nbsp;&nbsp; Missing: <strong>{missing_count}</strong> &nbsp;&nbsp; Tool Match Score: <strong>{tool_match_pct}%</strong></div>"
-        "<div style='display:flex;gap:1rem;margin-top:0.6rem'>"
-        "<div style='flex:1'>"
-        "<div class='ml'>Matched Tools</div>"
-        f"{chips(matched_tools,'match','No matched tools found.')}"
-        "</div>"
-        "<div style='flex:1'>"
-        "<div class='ml'>Missing / Unmatched Tools</div>"
-        f"{chips(missing_tools,'gap','No missing tools! Candidate covers all job tools.') }"
-        "</div>"
-        "</div>"
-        "</div>"
-    )
-    st.markdown(tools_html, unsafe_allow_html=True)
+    # tools_html = (
+    #     "<div class='card'><div class='kicker'>🛠️ Tool Match Analysis</div><h3 class='heading'>Tools required by the job</h3>"
+    #     f"<div class='copy' style='margin-top:.5rem'>Tools Required: <strong>{total_tools}</strong> &nbsp;&nbsp; Matched: <strong>{matched_count}</strong> &nbsp;&nbsp; Missing: <strong>{missing_count}</strong> &nbsp;&nbsp; Tool Match Score: <strong>{tool_match_pct}%</strong></div>"
+    #     "<div style='display:flex;gap:1rem;margin-top:0.6rem'>"
+    #     "<div style='flex:1'>"
+    #     "<div class='ml'>Matched Tools</div>"
+    #     f"{chips(matched_tools,'match','No matched tools found.')}"
+    #     "</div>"
+    #     "<div style='flex:1'>"
+    #     "<div class='ml'>Missing / Unmatched Tools</div>"
+    #     f"{chips(missing_tools,'gap','No missing tools! Candidate covers all job tools.') }"
+    #     "</div>"
+    #     "</div>"
+    #     "</div>"
+    # )
+    # st.markdown(tools_html, unsafe_allow_html=True)
 
     # Render consolidated job skill coverage
-    job_html = (
-        "<div class='card' style='margin-top:0.8rem'><div class='kicker'>📋 Job skill coverage (required, preferred & tools)</div>"
-        f"<h3 class='heading'>Job-relevant skills</h3>"
-        f"<div class='copy' style='margin-top:.5rem'>Skills Required by Job: <strong>{total_job_skills}</strong> &nbsp;&nbsp; Matched: <strong>{matched_job_count}</strong> &nbsp;&nbsp; Missing: <strong>{missing_job_count}</strong> &nbsp;&nbsp; Job Skill Match Score: <strong>{job_skill_match_pct}%</strong></div>"
-        "<div style='display:flex;gap:1rem;margin-top:0.6rem'>"
-        "<div style='flex:1'>"
-        "<div class='ml'>Matched Skills</div>"
-        f"{chips(matched_job_skills,'match','No matched job skills found.')}"
-        "</div>"
-        "<div style='flex:1'>"
-        "<div class='ml'>Missing Skills</div>"
-        f"{chips(missing_job_skills,'gap','No missing job skills — candidate covers all job-relevant skills.') }"
-        "</div>"
-        "</div>"
-        "</div>"
-    )
-    st.markdown(job_html, unsafe_allow_html=True)
+    # job_html = (
+    #     "<div class='card' style='margin-top:0.8rem'><div class='kicker'>📋 Job skill coverage (required, preferred & tools)</div>"
+    #     f"<h3 class='heading'>Job-relevant skills</h3>"
+    #     f"<div class='copy' style='margin-top:.5rem'>Skills Required by Job: <strong>{total_job_skills}</strong> &nbsp;&nbsp; Matched: <strong>{matched_job_count}</strong> &nbsp;&nbsp; Missing: <strong>{missing_job_count}</strong> &nbsp;&nbsp; Job Skill Match Score: <strong>{job_skill_match_pct}%</strong></div>"
+    #     "<div style='display:flex;gap:1rem;margin-top:0.6rem'>"
+    #     "<div style='flex:1'>"
+    #     "<div class='ml'>Matched Skills</div>"
+    #     f"{chips(matched_job_skills,'match','No matched job skills found.')}"
+    #     "</div>"
+    #     "<div style='flex:1'>"
+    #     "<div class='ml'>Missing Skills</div>"
+    #     f"{chips(missing_job_skills,'gap','No missing job skills — candidate covers all job-relevant skills.') }"
+    #     "</div>"
+    #     "</div>"
+    #     "</div>"
+    # )
+    # st.markdown(job_html, unsafe_allow_html=True)
 
     explanation=ai.get("explanation") if ai.get("status")=="ok" else a.get("explanation","")
     st.markdown(f"<div class='card'><div class='kicker'>Explainable screening</div><h3 class='heading'>Why this score?</h3><div class='explain'>{esc(explanation)}</div></div>",unsafe_allow_html=True)
