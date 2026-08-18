@@ -8,7 +8,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from src.preprocessing import preprocess_text
 from src.skill_ontology import full_skill_weights_map
-from src.skill_extraction import extract_skills
+from src.skill_extraction import extract_skills, get_jd_skill_groups
 
 
 def calculate_baseline_match(candidate_skills: List[str], required_jd_skills: List[str], preferred_jd_skills: List[str], weight_required: float = 1.0, weight_preferred: float = 0.5) -> Dict[str, object]:
@@ -85,28 +85,57 @@ def calculate_combined_score(weighted_skill_score: float, tfidf_similarity_score
     return round((weighted_skill_score * weight_skill_score) + (tfidf_similarity_score * weight_tfidf_score), 2)
 
 
-def analyze_resume(job_description: str, resume_text: str, skill_map=None, preprocessor_func=None, skill_weights_map=None) -> Dict[str, object]:
-    required_skills_jd, preferred_skills_jd = get_jd_skills_from_text(job_description, skill_map, preprocessor_func)
+def _match_group(candidate_skills: List[str], job_skills: List[str]) -> tuple[list[str], list[str], float]:
+    candidate_set = set(candidate_skills)
+    job_set = set(job_skills)
+    matched = sorted(candidate_set & job_set)
+    missing = sorted(job_set - candidate_set)
+    score = round((len(matched) / len(job_set)) * 100, 2) if job_set else 0.0
+    return matched, missing, score
+
+
+def analyze_resume(job_description: str, resume_text: str, skill_map=None, preprocessor_func=None, skill_weights_map=None, weight_skill_score: float = 0.70, weight_tfidf_score: float = 0.30) -> Dict[str, object]:
+    required_skills_jd, preferred_skills_jd, tools_jd = get_jd_skill_groups(job_description, skill_map, preprocessor_func)
     extracted_skills = extract_skills(resume_text, skill_map=skill_map, preprocessor_func=preprocessor_func)
 
     baseline_results = calculate_baseline_match(extracted_skills, required_skills_jd, preferred_skills_jd)
     weighted_score = calculate_weighted_skill_score(extracted_skills, required_skills_jd, preferred_skills_jd, skill_weights_map=skill_weights_map)
     tfidf_scores = calculate_tfidf_similarity(job_description, [resume_text])
     tfidf_similarity_score = tfidf_scores[0] if tfidf_scores else 0.0
-    combined_score = calculate_combined_score(weighted_score, tfidf_similarity_score)
+
+    # Use the exact formula required: final/combined score is the weighted sum of the two component scores.
+    combined_score = calculate_combined_score(weighted_score, tfidf_similarity_score, weight_skill_score=weight_skill_score, weight_tfidf_score=weight_tfidf_score)
+
+    matched_tools, missing_tools, tools_score = _match_group(extracted_skills, tools_jd)
+    _, _, required_score = _match_group(extracted_skills, required_skills_jd)
+    _, _, preferred_score = _match_group(extracted_skills, preferred_skills_jd)
+    total_job_skills = len(required_skills_jd) + len(preferred_skills_jd) + len(tools_jd)
+    total_matched = len(baseline_results["matched_required_skills"]) + len(baseline_results["matched_preferred_skills"]) + len(matched_tools)
+    overall_skill_match_score = round((total_matched / total_job_skills) * 100, 2) if total_job_skills else 0.0
 
     return {
         "required_skills": required_skills_jd,
         "preferred_skills": preferred_skills_jd,
+        "tools": tools_jd,
         "extracted_skills": extracted_skills,
         "matched_required_skills": baseline_results["matched_required_skills"],
         "missing_required_skills": baseline_results["missing_required_skills"],
         "matched_preferred_skills": baseline_results["matched_preferred_skills"],
         "missing_preferred_skills": baseline_results["missing_preferred_skills"],
+        "matched_tools": matched_tools,
+        "missing_tools": missing_tools,
+        "required_skill_match_score": required_score,
+        "preferred_skill_match_score": preferred_score,
+        "tools_match_score": tools_score,
+        "overall_skill_match_score": overall_skill_match_score,
         "baseline_match_percentage": baseline_results["baseline_match_percentage"],
         "weighted_skill_score": weighted_score,
         "tfidf_similarity_score": tfidf_similarity_score,
+        "weight_skill_score": weight_skill_score,
+        "weight_tfidf_score": weight_tfidf_score,
         "combined_score": combined_score,
+        # alias for clarity (the project historically used 'combined_score', but 'final_score' is the same)
+        "final_score": combined_score,
     }
 
 
