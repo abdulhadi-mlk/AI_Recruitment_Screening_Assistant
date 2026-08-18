@@ -163,13 +163,13 @@ def show_results(a):
         st.markdown(f"<div class='score'><div class='sl'>Final match score</div><div class='ring' style='--score:{final_score}'><div class='num'>{final_display}<small>%</small></div></div><div style='color:#c1d4f8;font-size:.86rem'>Job-relevant qualification match</div></div>",unsafe_allow_html=True)
 
         breakdown_html = (
-            f"<div class='card'><div class='ml'>Final match score (backend)</div>"
+            f"<div class='card'><div class='ml'>Final match score </div>"
             f"<div class='mv' style='font-size:1.25rem;margin-top:.45rem'>{final_display}%</div>"
             f"<hr style='border:none;border-top:1px solid #e6eef9;margin:0.75rem 0'/>"
             f"<div class='ml'>Weighted Skill Score</div><div class='mv'>{weighted_skill_score:.1f}%</div>"
-            f"<div class='ml' style='margin-top:.45rem'>Skill Weight</div><div class='mv'>{weight_skill_score*100:.0f}%</div>"
+            # f"<div class='ml' style='margin-top:.45rem'>Skill Weight</div><div class='mv'>{weight_skill_score*100:.0f}%</div>"
             f"<div class='ml' style='margin-top:.45rem'>TF-IDF Similarity</div><div class='mv'>{tfidf_similarity_score:.1f}%</div>"
-            f"<div class='ml' style='margin-top:.45rem'>TF-IDF Weight</div><div class='mv'>{weight_tfidf_score*100:.0f}%</div>"
+            # f"<div class='ml' style='margin-top:.45rem'>TF-IDF Weight</div><div class='mv'>{weight_tfidf_score*100:.0f}%</div>"
             f"</div>"
         )
         st.markdown(breakdown_html, unsafe_allow_html=True)
@@ -193,7 +193,35 @@ def show_results(a):
     with preferred_col:
         st.markdown(f"<div class='card'><h3 class='heading'>Preferred skills</h3><div class='ml'>Matched</div>{chips(a.get('matched_preferred_skills',[]),'match','No preferred skills matched.')}<div class='ml' style='margin-top:.8rem'>Missing</div>{chips(a.get('missing_preferred_skills',[]),'gap','No preferred-skill gaps.')}</div>",unsafe_allow_html=True)
     with tools_col:
-        st.markdown(f"<div class='card'><h3 class='heading'>Tools</h3><div class='ml'>Matched</div>{chips(a.get('matched_tools',[]),'match','No tools matched.')}<div class='ml' style='margin-top:.8rem'>Missing</div>{chips(a.get('missing_tools',[]),'gap','No tool gaps.')}</div>",unsafe_allow_html=True)
+        st.markdown(f"<div class='card'><h3 class='heading'>Tools (brief)</h3><div class='ml'>Matched</div>{chips(a.get('matched_tools',[]),'match','No tools matched.')}<div class='ml' style='margin-top:.8rem'>Missing</div>{chips(a.get('missing_tools',[]),'gap','No tool gaps.')}</div>",unsafe_allow_html=True)
+
+    # Dedicated Tool Match Analysis section
+    matched_tools = a.get('matched_tools',[]) or []
+    missing_tools = a.get('missing_tools',[]) or []
+    all_tools = a.get('tools',[]) or []
+    total_tools = len(all_tools)
+    matched_count = len(matched_tools)
+    missing_count = len(missing_tools)
+    tool_match_pct = round((matched_count / total_tools) * 100, 2) if total_tools else 0.0
+
+    # Render tool analysis card
+    tools_html = (
+        "<div class='card'><div class='kicker'>🛠️ Tool Match Analysis</div><h3 class='heading'>Tools required by the job</h3>"
+        f"<div class='copy' style='margin-top:.5rem'>Tools Required: <strong>{total_tools}</strong> &nbsp;&nbsp; Matched: <strong>{matched_count}</strong> &nbsp;&nbsp; Missing: <strong>{missing_count}</strong> &nbsp;&nbsp; Tool Match Score: <strong>{tool_match_pct}%</strong></div>"
+        "<div style='display:flex;gap:1rem;margin-top:0.6rem'>"
+        "<div style='flex:1'>"
+        "<div class='ml'>Matched Tools</div>"
+        f"{chips(matched_tools,'match','No matched tools found.')}"
+        "</div>"
+        "<div style='flex:1'>"
+        "<div class='ml'>Missing / Unmatched Tools</div>"
+        f"{chips(missing_tools,'gap','No missing tools! Candidate covers all job tools.') }"
+        "</div>"
+        "</div>"
+        "</div>"
+    )
+    st.markdown(tools_html, unsafe_allow_html=True)
+
     explanation=ai.get("explanation") if ai.get("status")=="ok" else a.get("explanation","")
     st.markdown(f"<div class='card'><div class='kicker'>Explainable screening</div><h3 class='heading'>Why this score?</h3><div class='explain'>{esc(explanation)}</div></div>",unsafe_allow_html=True)
     groups=group_skills_by_category(a.get("extracted_skills",[]) or [],skill_to_category_map)
