@@ -113,6 +113,17 @@ def analyze_resume(job_description: str, resume_text: str, skill_map=None, prepr
     total_matched = len(baseline_results["matched_required_skills"]) + len(baseline_results["matched_preferred_skills"]) + len(matched_tools)
     overall_skill_match_score = round((total_matched / total_job_skills) * 100, 2) if total_job_skills else 0.0
 
+    # Create a consolidated set of job-relevant skills (required + preferred + tools)
+    job_relevant_skills = sorted(set(required_skills_jd) | set(preferred_skills_jd) | set(tools_jd))
+
+    # Flatten candidate skills into a set (ensures skills across all categories are included)
+    all_candidate_skills_set = set(extracted_skills)
+
+    # Compute matches vs the consolidated job skill set
+    matched_job_skills = sorted(list(all_candidate_skills_set.intersection(job_relevant_skills)))
+    missing_job_skills = sorted(list(set(job_relevant_skills) - all_candidate_skills_set))
+    job_skill_match_score = round((len(matched_job_skills) / len(job_relevant_skills) * 100), 2) if job_relevant_skills else 0.0
+
     return {
         "required_skills": required_skills_jd,
         "preferred_skills": preferred_skills_jd,
@@ -124,6 +135,10 @@ def analyze_resume(job_description: str, resume_text: str, skill_map=None, prepr
         "missing_preferred_skills": baseline_results["missing_preferred_skills"],
         "matched_tools": matched_tools,
         "missing_tools": missing_tools,
+        "matched_job_skills": matched_job_skills,
+        "missing_job_skills": missing_job_skills,
+        "job_relevant_skills": job_relevant_skills,
+        "job_skill_match_score": job_skill_match_score,
         "required_skill_match_score": required_score,
         "preferred_skill_match_score": preferred_score,
         "tools_match_score": tools_score,
