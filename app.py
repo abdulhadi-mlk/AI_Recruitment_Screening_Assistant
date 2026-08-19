@@ -319,7 +319,15 @@ def main():
         if len(results)>1:
             frame=ranked(results);st.markdown("<div class='card'><div class='kicker'>Batch screening</div><h2 class='heading'>Ranked candidates</h2>",unsafe_allow_html=True);st.dataframe(frame[["rank","candidate","skills_matched","combined_score","recommendation_category"]],use_container_width=True,hide_index=True)
             pick=st.selectbox("View candidate",range(len(results)),format_func=lambda i:f"{results[i]['candidate_id']} — {results[i]['combined_score']}/100");st.session_state.analysis=results[pick];st.download_button("Download results CSV",frame.to_csv(index=False).encode(),"safex_candidate_screening.csv","text/csv");st.markdown("</div>",unsafe_allow_html=True)
-        show_results(st.session_state.analysis);notices();chat()
+        show_results(st.session_state.analysis)
+        notices()
+        if os.getenv("GEMINI_API_KEY", "").strip():
+            chat()
+        else:
+            st.markdown(
+                "<div class='card'><div class='kicker'>Follow-up assessment</div><h2 class='heading'>Follow-up questions disabled</h2><p class='copy'>The AI service is not configured for follow-up questions.</p><p class='copy'>To enable follow-up questions on Streamlit Community Cloud: open your app on share.streamlit.io → Settings → Secrets, add the key <code>GEMINI_API_KEY</code> (and optionally <code>GEMINI_MODEL</code>), then restart the app.</p><details style='margin-top:.6rem'><summary style='cursor:pointer;'>Show configuration snippet</summary><pre style='background:#f6f9ff;padding:0.6rem;border-radius:8px'>GEMINI_API_KEY=your_actual_key_here\nGEMINI_MODEL=gemini-3.6-flash</pre></details></div>",
+                unsafe_allow_html=True,
+            )
     else: st.markdown("<div class='empty'><div style='font-size:2rem;color:#2878f0'>✦</div><strong>Ready when you are</strong><br><span>Provide a job description and a resume to generate job-relevant screening insights.</span></div>",unsafe_allow_html=True);notices()
 
 if __name__=="__main__": main()
